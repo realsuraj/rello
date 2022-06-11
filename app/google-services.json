@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "386050286786",
+    "project_id": "reelo-6a164",
+    "storage_bucket": "reelo-6a164.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:386050286786:android:13b30a0f818cee861f075b",
+        "android_client_info": {
+          "package_name": "com.tiwari.suraj.rello"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "386050286786-8o471p8olh6qan8u8d9t5f35n1bk9sr1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXPt3-LNNY2-7TYaN_NSs7CY6cNhvYStw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "386050286786-8o471p8olh6qan8u8d9t5f35n1bk9sr1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
