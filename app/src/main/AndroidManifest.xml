@@ -16,7 +16,7 @@
         tools:targetApi="m">
         <activity
             android:name=".HomePage"
-            android:exported="false"
+            android:exported="true"
             android:theme="@style/FullScreen"/>
         <activity
             android:name=".LoginPage"
