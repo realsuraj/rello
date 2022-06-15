@@ -11,37 +11,32 @@ import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+
 import java.util.List;
 
-public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHolder>{
-    private List<VideoItem> videoItems;
+public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter.VideoViewHolder> {
 
-    public VideoAdapter(List<VideoItem> videoItems) {
-        this.videoItems = videoItems;
+
+
+    public VideoAdapter(@NonNull FirebaseRecyclerOptions<VideoItem> options) {
+        super(options);
+    }
+
+    @Override
+    protected void onBindViewHolder(@NonNull VideoViewHolder holder, int position, @NonNull VideoItem model) {
+        holder.setVideoData(model);
     }
 
     @NonNull
     @Override
     public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new VideoViewHolder(
-                LayoutInflater.from(parent.getContext()).inflate(
-                        R.layout.item_container_video,parent,false
-                )
-        );
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_container_video,parent,false);
+        return new VideoViewHolder(view);
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
-
-    holder.setVideoData(videoItems.get(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return videoItems.size();
-    }
-
-    static class VideoViewHolder extends RecyclerView.ViewHolder {
+    class VideoViewHolder extends RecyclerView.ViewHolder {
 
         VideoView videoView;
         TextView textVideoTitle, textVideoDescription;
@@ -57,7 +52,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
         }
         void setVideoData(VideoItem videoItem){
             textVideoTitle.setText(videoItem.videoTitle);
-            textVideoDescription.setText(videoItem.videoTitle);
+            textVideoDescription.setText(videoItem.videoDescription);
             videoView.setVideoPath(videoItem.videoUrl);
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override

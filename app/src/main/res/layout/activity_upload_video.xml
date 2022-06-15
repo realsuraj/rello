@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UploadVideo"
+    android:orientation="vertical">
+    <!--EditText for adding employee name-->
+    <EditText
+        android:id="@+id/videoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        android:hint="Enter Video Title"
+        android:importantForAutofill="no"
+        android:inputType="text" />
+
+    <!--EditText for adding employee phone-->
+    <EditText
+        android:id="@+id/videoDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoTitle"
+        android:layout_margin="10dp"
+        android:hint="Enter Video Description"
+        android:importantForAutofill="no"
+        android:inputType="text" />
+
+    <!--EditText for adding employee address-->
+    <EditText
+        android:id="@+id/videoTag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoDescription"
+        android:layout_margin="10dp"
+        android:hint="Enter employee address"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/uploadv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload Video" />
+
+    <!--Button for adding data to Firebase-->
+    <Button
+        android:id="@+id/idBtnSendData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoTag"
+        android:layout_margin="10dp"
+        android:text="Add employee details"
+        android:textAllCaps="false" />
+
+
+
+</LinearLayout>

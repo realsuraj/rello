@@ -2,22 +2,36 @@ package com.tiwari.suraj.rello;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.Toast;
+
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link SecondFragment#newInstance} factory method to
+ * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SecondFragment extends Fragment {
+public class HomeFragment extends Fragment {
+
+    DatabaseReference databaseReference;
+    VideoAdapter videoAdapter;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,7 +42,7 @@ public class SecondFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public SecondFragment() {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
@@ -41,8 +55,8 @@ public class SecondFragment extends Fragment {
      * @return A new instance of fragment SecondFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SecondFragment newInstance(String param1, String param2) {
-        SecondFragment fragment = new SecondFragment();
+    public static HomeFragment newInstance(String param1, String param2) {
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -63,29 +77,27 @@ public class SecondFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-         View v = inflater.inflate(R.layout.fragment_second, container, false);
+        View v = inflater.inflate(R.layout.fragment_home, container, false);
         final ViewPager2 videoViewPager = v.findViewById(R.id.videosViewPager);
-        
-        List<VideoItem> videoItems = new ArrayList<>();
-        VideoItem videoItemCelebration = new VideoItem();
-        videoItemCelebration.videoUrl = "https://assets.mixkit.co/videos/preview/mixkit-mysterious-pale-looking-fashion-woman-at-winter-39878-large.mp4";
-        videoItemCelebration.videoTitle = "first video";
-        videoItemCelebration.videoDescription = "first Description";
-        videoItems.add(videoItemCelebration);
 
-        VideoItem videoItemStart = new VideoItem();
-        videoItemStart.videoUrl = "https://assets.mixkit.co/videos/preview/mixkit-portrait-of-a-woman-in-a-pool-1259-large.mp4";
-        videoItemStart.videoTitle = "secound video";
-        videoItemStart.videoDescription = "secound Description";
-        videoItems.add(videoItemStart);
+        FirebaseRecyclerOptions<VideoItem> videoitem =
+                new FirebaseRecyclerOptions.Builder<VideoItem>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference().child("Videos"), VideoItem.class)
+                        .build();
+        videoAdapter = new VideoAdapter(videoitem);
+        videoViewPager.setAdapter(videoAdapter);
 
-        VideoItem videoItemStart1 = new VideoItem();
-        videoItemStart1.videoUrl = "https://assets.mixkit.co/videos/preview/mixkit-portrait-of-a-woman-in-a-pool-1259-large.mp4";
-        videoItemStart1.videoTitle = "third video";
-        videoItemStart1.videoDescription = "third Description";
-        videoItems.add(videoItemStart1);
-
-        videoViewPager.setAdapter(new VideoAdapter(videoItems));
-         return v;
+        return v;
     }
+        @Override
+        public void onStart(){
+            super.onStart();
+            videoAdapter.startListening();
+        }
+        @Override
+        public void onStop(){
+            super.onStop();
+            videoAdapter.startListening();
+        }
+
 }
