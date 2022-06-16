@@ -21,10 +21,10 @@ import com.google.android.gms.tasks.Task;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PersonFragment#newInstance} factory method to
+ * Use the {@link ExploreFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PersonFragment extends Fragment {
+public class ExploreFragment extends Fragment {
 
     TextView infotxt ;
     Button logoutBtn, uploadVideo;
@@ -46,7 +46,7 @@ public class PersonFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public PersonFragment() {
+    public ExploreFragment() {
         // Required empty public constructor
     }
 
@@ -59,8 +59,8 @@ public class PersonFragment extends Fragment {
      * @return A new instance of fragment FirstFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PersonFragment newInstance(String param1, String param2) {
-        PersonFragment fragment = new PersonFragment();
+    public static ExploreFragment newInstance(String param1, String param2) {
+        ExploreFragment fragment = new ExploreFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -88,7 +88,7 @@ public class PersonFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_person, container, false);
+        View v = inflater.inflate(R.layout.fragment_explore, container, false);
         infotxt = v.findViewById(R.id.infotxt);
         uploadVideo = v.findViewById(R.id.uploadVideo);
         logoutBtn = v.findViewById(R.id.logoutbtn);
@@ -97,6 +97,9 @@ public class PersonFragment extends Fragment {
             email = account.getEmail();
             infotxt.setText(username);
         }
+
+
+
 
         uploadVideo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,5 +131,6 @@ public class PersonFragment extends Fragment {
 
             }
         });
+
     }
 }

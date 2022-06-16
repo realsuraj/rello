@@ -31,24 +31,24 @@ public class HomePage extends AppCompatActivity implements BottomNavigationView.
         bottomNavigationView.setSelectedItemId(R.id.home);
     }
 
-    PersonFragment personFragment = new PersonFragment();
+    ExploreFragment exploreFragment = new ExploreFragment();
     HomeFragment homeFragment = new HomeFragment();
-    SettingFragment settingFragment = new SettingFragment();
+    ProfileFragment profileFragment = new ProfileFragment();
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.person:
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, personFragment).commit();
+            case R.id.explore:
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, exploreFragment).commit();
                 return true;
 
             case R.id.home:
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, homeFragment).commit();
                 return true;
 
-            case R.id.settings:
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, settingFragment).commit();
+            case R.id.profile:
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, profileFragment).commit();
                 return true;
         }
         return false;

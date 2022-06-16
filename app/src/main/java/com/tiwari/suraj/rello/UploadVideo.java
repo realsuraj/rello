@@ -117,7 +117,7 @@ public class UploadVideo extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 5 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             videouri = data.getData();
-            Toast.makeText(this, "video processing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "completed processing", Toast.LENGTH_SHORT).show();
         }
     }
 

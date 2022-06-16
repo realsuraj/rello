@@ -4,21 +4,34 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Adapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +43,14 @@ import java.util.List;
  */
 public class HomeFragment extends Fragment {
 
-    DatabaseReference databaseReference;
-    VideoAdapter videoAdapter;
+
+     VideoAdapter videoAdapter;
+     FloatingActionButton likeBtn;
+    public static TextView likeCountTxtv;
+    public static GoogleSignInAccount account;
+    public static String username,email;
+    public static int likeCount;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,6 +83,8 @@ public class HomeFragment extends Fragment {
         return fragment;
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,17 +97,31 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+        likeCountTxtv = (TextView) v.findViewById(R.id.likeCount);
+
         final ViewPager2 videoViewPager = v.findViewById(R.id.videosViewPager);
+        account = GoogleSignIn.getLastSignedInAccount(getContext());
+        if(account != null){
+            username = account.getDisplayName();
+            email = account.getEmail();
+            PrefConfig.setUsername(username);
+        }
+
+
+
+        likeBtn =(FloatingActionButton) v.findViewById(R.id.likeFloatingBtn);
+        likeCountTxtv = (TextView) v.findViewById(R.id.likeCount);
 
         FirebaseRecyclerOptions<VideoItem> videoitem =
                 new FirebaseRecyclerOptions.Builder<VideoItem>()
                         .setQuery(FirebaseDatabase.getInstance().getReference().child("Videos"), VideoItem.class)
                         .build();
+
         videoAdapter = new VideoAdapter(videoitem);
         videoViewPager.setAdapter(videoAdapter);
-
         return v;
     }
         @Override
@@ -99,5 +134,7 @@ public class HomeFragment extends Fragment {
             super.onStop();
             videoAdapter.startListening();
         }
+
+
 
 }
