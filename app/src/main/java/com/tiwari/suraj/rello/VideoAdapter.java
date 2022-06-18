@@ -30,9 +30,7 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
 
     DatabaseReference likeReference;
     Boolean testclick = false;
-    public static DatabaseReference likeDatabaseReference;
-    public static TextView likeCountTextview;
-    public static FloatingActionButton likebtn;
+
 
     public VideoAdapter(@NonNull FirebaseRecyclerOptions<VideoItem> options) {
         super(options);
@@ -43,10 +41,9 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
         holder.setVideoData(model);
         String userid = PrefConfig.getUsername();
         String videoKey = getRef(position).getKey();
-
-        getLikeButtonStatus(userid,videoKey);
+        holder.getLikeButtonStatus(userid,videoKey);
         likeReference = FirebaseDatabase.getInstance().getReference("Likes");
-        likebtn.setOnClickListener(new View.OnClickListener() {
+        holder.likebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 testclick = true;
@@ -81,12 +78,13 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
         return new VideoViewHolder(view);
     }
 
-    class VideoViewHolder extends RecyclerView.ViewHolder {
+    static class VideoViewHolder extends RecyclerView.ViewHolder {
 
         VideoView videoView;
         TextView textVideoTitle, textVideoDescription;
         ProgressBar videoProgressBar;
-
+        public TextView likeCountTextview;
+        FloatingActionButton likebtn;
 
 
 
@@ -100,6 +98,8 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
             likeCountTextview = itemView.findViewById(R.id.likeCount);
 
         }
+
+
         void setVideoData(VideoItem videoItem){
             textVideoTitle.setText(videoItem.videoTitle);
             textVideoDescription.setText(videoItem.videoDescription);
@@ -128,32 +128,35 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
                 }
             });
         }
-    }
 
-    public static void getLikeButtonStatus(String userid, String videoKey) {
-        likeDatabaseReference = FirebaseDatabase.getInstance().getReference("Likes");
+        public void getLikeButtonStatus(String userid, String videoKey) {
+            DatabaseReference likeDatabaseReference;
+            likeDatabaseReference = FirebaseDatabase.getInstance().getReference("Likes");
+            likeDatabaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.child(videoKey).hasChild(userid)){
+                        int likeCount = (int) dataSnapshot.child(videoKey).getChildrenCount();
+                        likeCountTextview.setText(""+ likeCount + " Likes");
+                        likebtn.setImageResource(R.drawable.ic_baseline_favorite_24);
 
-        likeDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child(videoKey).hasChild(userid)){
-                    int likeCount = (int) dataSnapshot.child(videoKey).getChildrenCount();
-                    likeCountTextview.setText(likeCount + " Likes");
-                    likebtn.setImageResource(R.drawable.ic_baseline_favorite_24);
+                    }
+                    else{
+                        int likeCount = (int) dataSnapshot.child(videoKey).getChildrenCount();
+                        likeCountTextview.setText(likeCount + " Likes");
+                        likebtn.setImageResource(R.drawable.ic_baseline_favorite_border_24);
+
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-                else {
-                    int likeCount = (int) dataSnapshot.child(videoKey).getChildrenCount();
-                    likeCountTextview.setText(likeCount + " Likes");
-                    likebtn.setImageResource(R.drawable.ic_baseline_favorite_border_24);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+            });
+        }
     }
+
+
 }
