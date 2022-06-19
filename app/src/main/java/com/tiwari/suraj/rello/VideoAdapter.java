@@ -1,37 +1,40 @@
 package com.tiwari.suraj.rello;
 
 import android.media.MediaPlayer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter.VideoViewHolder> {
 
-    DatabaseReference likeReference;
+    DatabaseReference likeReference, commentRef;
     Boolean testclick = false;
-
-
+    FirebaseRecyclerOptions<Comment> commentOption;
+    FirebaseRecyclerAdapter<Comment, CommentViewHolder> commentAdaptor;
+    public static RecyclerView recyclerViewComment;
     public VideoAdapter(@NonNull FirebaseRecyclerOptions<VideoItem> options) {
         super(options);
     }
@@ -43,6 +46,8 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
         String videoKey = getRef(position).getKey();
         holder.getLikeButtonStatus(userid,videoKey);
         likeReference = FirebaseDatabase.getInstance().getReference("Likes");
+        commentRef = FirebaseDatabase.getInstance().getReference("Comments");
+
         holder.likebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,7 +73,57 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
             });
             }
         });
+        holder.commentSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String comment = holder.commentEdit.getText().toString();
+                if(comment.isEmpty()){
+                    Toast.makeText(v.getContext(), "Write something", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    AddComment(holder,videoKey,commentRef, userid,comment);
+                }
+            }
+        });
 
+        loadComment(videoKey);
+
+    }
+
+    private void loadComment(String videoKey) {
+        recyclerViewComment.setLayoutManager(new LinearLayoutManager(recyclerViewComment.getContext()));
+        commentOption = new FirebaseRecyclerOptions.Builder<Comment>().setQuery(commentRef.child(videoKey),Comment.class).build();
+        commentAdaptor = new FirebaseRecyclerAdapter<Comment, CommentViewHolder>(commentOption) {
+            @Override
+            protected void onBindViewHolder(@NonNull CommentViewHolder holder, int position, @NonNull Comment model) {
+                holder.userComment.setText(model.getUserComment());
+                holder.usernameComment.setText(model.getUsernameComment());
+            }
+
+            @NonNull
+            @Override
+            public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_view_comment,parent,false);
+                return new CommentViewHolder(view);
+            }
+        };
+
+        commentAdaptor.startListening();
+        recyclerViewComment.setAdapter(commentAdaptor);
+    }
+
+    private void AddComment(VideoViewHolder holder, String videoKey, DatabaseReference commentRef, String userid, String comment) {
+        HashMap hashMap = new HashMap();
+        hashMap.put("comment",comment);
+        commentRef.child(videoKey).child(userid).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if(task.isSuccessful())
+                {
+
+                }
+            }
+        });
     }
 
     @NonNull
@@ -78,14 +133,15 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
         return new VideoViewHolder(view);
     }
 
-    static class VideoViewHolder extends RecyclerView.ViewHolder {
+    class VideoViewHolder extends RecyclerView.ViewHolder {
 
         VideoView videoView;
         TextView textVideoTitle, textVideoDescription;
+        Button commentSend;
+        EditText commentEdit;
         ProgressBar videoProgressBar;
         public TextView likeCountTextview;
         FloatingActionButton likebtn;
-
 
 
         public VideoViewHolder(@NonNull View itemView){
@@ -96,7 +152,9 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
             videoProgressBar = itemView.findViewById(R.id.videoProgressBar);
             likebtn = itemView.findViewById(R.id.likeFloatingBtn);
             likeCountTextview = itemView.findViewById(R.id.likeCount);
-
+            commentEdit = itemView.findViewById(R.id.commentEdit);
+            commentSend = itemView.findViewById(R.id.commentSendBtn);
+            recyclerViewComment = itemView.findViewById(R.id.commentRecycler);
         }
 
 
@@ -128,6 +186,8 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
                 }
             });
         }
+
+
 
         public void getLikeButtonStatus(String userid, String videoKey) {
             DatabaseReference likeDatabaseReference;

@@ -111,11 +111,6 @@ public class HomeFragment extends Fragment {
             PrefConfig.setUsername(username);
         }
 
-
-
-        likeBtn =(FloatingActionButton) v.findViewById(R.id.likeFloatingBtn);
-        likeCountTxtv = (TextView) v.findViewById(R.id.likeCount);
-
         FirebaseRecyclerOptions<VideoItem> videoitem =
                 new FirebaseRecyclerOptions.Builder<VideoItem>()
                         .setQuery(FirebaseDatabase.getInstance().getReference().child("Videos"), VideoItem.class)
@@ -123,6 +118,13 @@ public class HomeFragment extends Fragment {
 
         videoAdapter = new VideoAdapter(videoitem);
         videoViewPager.setAdapter(videoAdapter);
+
+        FirebaseRecyclerOptions<Comment> commentFirebaseRecyclerOptions =
+                new FirebaseRecyclerOptions.Builder<Comment>()
+                .setQuery(FirebaseDatabase.getInstance().getReference("Comments"),Comment.class)
+                .build();
+
+
         return v;
     }
         @Override

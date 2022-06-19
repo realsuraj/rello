@@ -49,12 +49,82 @@
             <TextView
                 android:id="@+id/likeCount"
                 android:text="the"
-                android:layout_marginBottom="60dp"
+                android:layout_marginBottom="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:paddingRight="40dp"
                 />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/commentfltbtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@android:color/white"
+            android:src="@drawable/ic_baseline_favorite_border_24"
+            app:fabSize="normal"
+            android:clipToPadding="false"
+            android:clipChildren="false"/>
+        <TextView
+            android:id="@+id/commentCount"
+            android:text="the"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:paddingRight="40dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/commentHolder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/commentRecycler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/commentEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine" />
+                <Button
+                    android:id="@+id/commentSendBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="send"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/shareBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@android:color/white"
+            android:src="@drawable/ic_baseline_favorite_border_24"
+            app:fabSize="normal"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:layout_marginBottom="60dp"/>
 
 
         <TextView
@@ -71,6 +141,11 @@
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold"/>
+
+
+
+
+
 
         <TextView
             android:id="@+id/textVideoDescription"
