@@ -1,6 +1,12 @@
 package com.tiwari.suraj.rello;
 
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+
+import android.app.DownloadManager;
+import android.content.Context;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +33,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter.VideoViewHolder> {
@@ -34,6 +46,7 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
     Boolean testclick = false;
     FirebaseRecyclerOptions<Comment> commentOption;
     FirebaseRecyclerAdapter<Comment, CommentViewHolder> commentAdaptor;
+    Context context;
     public static RecyclerView recyclerViewComment;
     public VideoAdapter(@NonNull FirebaseRecyclerOptions<VideoItem> options) {
         super(options);
@@ -114,7 +127,8 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
 
     private void AddComment(VideoViewHolder holder, String videoKey, DatabaseReference commentRef, String userid, String comment) {
         HashMap hashMap = new HashMap();
-        hashMap.put("comment",comment);
+        hashMap.put("usernameComment",userid);
+        hashMap.put("userComment",comment);
         commentRef.child(videoKey).child(userid).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
             @Override
             public void onComplete(@NonNull Task task) {
@@ -130,6 +144,7 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
     @Override
     public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_container_video,parent,false);
+        context = parent.getContext();
         return new VideoViewHolder(view);
     }
 
@@ -185,6 +200,7 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
                     mp.start();
                 }
             });
+            DownloadVideo(videoItem);
         }
 
 
@@ -217,6 +233,56 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
             });
         }
     }
+
+    private void DownloadVideo(VideoItem model) {
+        StorageReference storageReference;
+        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(model.videoUrl);
+        storageReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+            @Override
+            public void onSuccess(StorageMetadata storageMetadata) {
+                String filename = storageMetadata.getName();
+                String FileType = storageMetadata.getContentType();
+                String fileDirectory = DIRECTORY_DOWNLOADS;
+
+                String path = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + filename;
+
+                File file = new File(path);
+                if (file.exists()) {
+                    Toast.makeText(context, "file exist", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(context, "file not exist download", Toast.LENGTH_SHORT).show();
+                    DownloadVideoFile(context, filename, fileDirectory, model.videoUrl);
+
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, "Failed" + e.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+
+    private void DownloadVideoFile(Context context, String filename, String destinationDirectory, String url) {
+
+        DownloadManager downloadManager = (DownloadManager) context.
+                getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(context, destinationDirectory, filename);
+
+        downloadManager.enqueue(request);
+
+    }
+
+
 
 
 }

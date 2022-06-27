@@ -108,7 +108,6 @@ public class HomeFragment extends Fragment {
         if(account != null){
             username = account.getDisplayName();
             email = account.getEmail();
-            PrefConfig.setUsername(username);
         }
 
         FirebaseRecyclerOptions<VideoItem> videoitem =
