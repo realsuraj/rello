@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.danikula.videocache.HttpProxyCacheServer;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,7 +44,7 @@ import java.util.HashMap;
 public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter.VideoViewHolder> {
 
     DatabaseReference likeReference, commentRef;
-    Boolean testclick = false;
+    Boolean testclick = false , isDownloadvideo = false;
     FirebaseRecyclerOptions<Comment> commentOption;
     FirebaseRecyclerAdapter<Comment, CommentViewHolder> commentAdaptor;
     Context context;
@@ -176,7 +177,13 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
         void setVideoData(VideoItem videoItem){
             textVideoTitle.setText(videoItem.videoTitle);
             textVideoDescription.setText(videoItem.videoDescription);
-            videoView.setVideoPath(videoItem.videoUrl);
+
+
+                HttpProxyCacheServer proxy = getProxy();
+                String proxyUrl = proxy.getProxyUrl(videoItem.videoUrl);
+                videoView.setVideoPath(proxyUrl);
+
+
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -200,9 +207,14 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
                     mp.start();
                 }
             });
-            DownloadVideo(videoItem);
+
         }
 
+        private HttpProxyCacheServer getProxy() {
+            return new HttpProxyCacheServer.Builder(context)
+                    .maxCacheSize(1024 * 1024 * 1024)       // 1 Gb for cache
+                    .build();
+        }
 
 
         public void getLikeButtonStatus(String userid, String videoKey) {
@@ -233,56 +245,4 @@ public class VideoAdapter extends FirebaseRecyclerAdapter<VideoItem,VideoAdapter
             });
         }
     }
-
-    private void DownloadVideo(VideoItem model) {
-        StorageReference storageReference;
-        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(model.videoUrl);
-        storageReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-            @Override
-            public void onSuccess(StorageMetadata storageMetadata) {
-                String filename = storageMetadata.getName();
-                String FileType = storageMetadata.getContentType();
-                String fileDirectory = DIRECTORY_DOWNLOADS;
-
-                String path = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + filename;
-
-                File file = new File(path);
-                if (file.exists()) {
-                    Toast.makeText(context, "file exist", Toast.LENGTH_SHORT).show();
-
-                } else {
-                    Toast.makeText(context, "file not exist download", Toast.LENGTH_SHORT).show();
-                    DownloadVideoFile(context, filename, fileDirectory, model.videoUrl);
-
-                }
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, "Failed" + e.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-    }
-
-
-    private void DownloadVideoFile(Context context, String filename, String destinationDirectory, String url) {
-
-        DownloadManager downloadManager = (DownloadManager) context.
-                getSystemService(Context.DOWNLOAD_SERVICE);
-        Uri uri = Uri.parse(url);
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalFilesDir(context, destinationDirectory, filename);
-
-        downloadManager.enqueue(request);
-
-    }
-
-
-
-
 }
